@@ -1,0 +1,30 @@
+name: 自动上传live.txt到FTP
+on:
+  push:  # 提交代码就触发，改live.txt自动传
+    branches: [main, master]
+    paths: ["live.txt"]  # 仅live.txt变动才触发，更高效
+  workflow_dispatch: # 手动触发备用
+jobs:
+  ftp-send-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
+      - name: 核心上传live.txt
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          local-dir: ./  # 根目录（live.txt在这里），结尾必须加/
+          remote-dir: /  # FTP目标目录，可改（例/wwwroot/），结尾加/
+          ftp:passive-mode: true  # 必开防超时
+          exclude: |  # 只传live.txt，排除所有其他文件
+            **/*
+            !live.txt  # 反向包含live.txt
+          dry-run: false  # 测试时改true，预览不上传
+          cleanup: false  # 禁止删除FTP文件，安全第一
