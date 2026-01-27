@@ -1,9 +1,9 @@
 name: 自动上传live.txt到FTP
 on:
-  push:  # 提交代码就触发，改live.txt自动传
+  push:
     branches: [main, master]
-    paths: ["live.txt"]  # 仅live.txt变动才触发，更高效
-  workflow_dispatch: # 手动触发备用
+    paths: ["live.txt"] # 仅live.txt变动触发
+  workflow_dispatch: # 手动触发
 jobs:
   ftp-send-file:
     runs-on: ubuntu-latest
@@ -12,19 +12,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          
-      - name: 核心上传live.txt
+
+      - name: 核心上传live.txt（修正参数版）
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          local-dir: ./  # 根目录（live.txt在这里），结尾必须加/
-          remote-dir: /  # FTP目标目录，可改（例/wwwroot/），结尾加/
-          ftp:passive-mode: true  # 必开防超时
-          exclude: |  # 只传live.txt，排除所有其他文件
+          protocol: ftp # 明确协议，默认ftp，SFTP改sftp
+          local-dir: ./ # 仓库根目录（live.txt位置）
+          server-dir: / # FTP目标目录，可改/wwwroot/等
+          exclude: | # 只传live.txt
             **/*
-            !live.txt  # 反向包含live.txt
-          dry-run: false  # 测试时改true，预览不上传
-          cleanup: false  # 禁止删除FTP文件，安全第一
+            !live.txt
+          dry-run: false # 测试改true
+          dangerous-clean-slate: false # 替代旧cleanup，禁用删除
+          security: strict # 兼容被动模式，解决连接超时
+          log-level: standard # 日志级别，方便排错
+          timeout: 30000 # 超时时间，防卡死
