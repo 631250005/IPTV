@@ -22,7 +22,7 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           protocol: ftp # 明确协议，默认ftp，SFTP改sftp
           local-dir: ./ # 仓库根目录（live.txt位置）
-          server-dir: / # FTP目标目录，可改/wwwroot/等
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }} # FTP目标目录，可改/wwwroot/等
           exclude: | # 只传live.txt
             **/*
             !live.txt
