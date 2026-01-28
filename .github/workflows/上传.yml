@@ -26,6 +26,9 @@ jobs:
           exclude: | # 只传live.m3u
             **/*
             !live.m3u
+            !e.xml
+            !e.xml.gz
+            !live.txt
           dry-run: false # 测试改true
           dangerous-clean-slate: false # 替代旧cleanup，禁用删除
           security: strict # 兼容被动模式，解决连接超时
