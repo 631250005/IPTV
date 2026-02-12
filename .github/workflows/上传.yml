@@ -1,9 +1,18 @@
 name: 自动上传live.m3u到FTP
 on:
-  push:
-    branches: [main, master]
-    paths: ["live.m3u"] # 仅live.m3u变动触发
+  schedule:
+    # cron 表达式：每隔6小时触发（UTC时间）
+    - cron: '0 */6 * * *'
+  
+  # 保留手动触发，方便测试
+
   workflow_dispatch: # 手动触发
+
+ 
+
+
+
+  
 jobs:
   ftp-send-file:
     runs-on: ubuntu-latest
